@@ -1,0 +1,50 @@
+name: Setup & Teardown
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - setup-argocd
+          - setup-namespace
+          - teardown
+
+jobs:
+  infrastructure:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup ArgoCD
+      if: github.event.inputs.action == 'setup-argocd'
+      run: |
+        kubectl create namespace argocd || true
+        kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+        
+        echo "🔐 Waiting for ArgoCD to be ready..."
+        kubectl wait --for=condition=available --timeout=300s \
+          deployment/argocd-server -n argocd
+        
+        echo "✅ ArgoCD installed successfully"
+        echo "To access ArgoCD UI:"
+        echo "kubectl port-forward svc/argocd-server -n argocd 8080:443"
+        echo ""
+        echo "Default admin password:"
+        kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
+    
+    - name: Create namespace
+      if: github.event.inputs.action == 'setup-namespace'
+      run: |
+        kubectl create namespace travel-app || true
+        echo "✅ Namespace 'travel-app' created"
+    
+    - name: Teardown
+      if: github.event.inputs.action == 'teardown'
+      run: |
+        echo "⚠️ Tearing down travel-app resources..."
+        kubectl delete namespace travel-app --ignore-not-found=true
+        echo "✅ Cleanup complete"

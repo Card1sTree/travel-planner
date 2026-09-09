@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: travel_user
+      POSTGRES_PASSWORD: travel_password
+      POSTGRES_DB: travel_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U travel_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  recommendation-engine:
+    build:
+      context: ./services/recommendation-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: postgresql://travel_user:travel_password@postgres:5432/travel_db
+      MODEL_PATH: /app/models/recommendation_model.pkl
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./ml/models:/app/models
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  user-api:
+    build:
+      context: ./services/user-api
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: postgresql://travel_user:travel_password@postgres:5432/travel_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  trip-planner:
+    build:
+      context: ./services/trip-planner
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8000"
+    environment:
+      DATABASE_URL: postgresql://travel_user:travel_password@postgres:5432/travel_db
+      RECOMMENDATION_ENGINE_URL: http://recommendation-engine:8000
+    depends_on:
+      - recommendation-engine
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: travel-app-network

@@ -1,0 +1,85 @@
+name: MLOps - Train Model
+
+on:
+  schedule:
+    # Train model daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ml/**'
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ml/requirements.txt
+        pip install dvc dvc-s3
+    
+    - name: Configure Git
+      run: |
+        git config --global user.email "devops@travel-app.com"
+        git config --global user.name "Travel App Bot"
+    
+    - name: Pull latest data from DVC
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        dvc pull
+    
+    - name: Prepare data
+      run: |
+        python ml/prepare_data.py
+    
+    - name: Train model
+      run: |
+        python ml/train.py
+    
+    - name: Evaluate model
+      run: |
+        python ml/evaluate.py
+    
+    - name: Push model to DVC
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        dvc add ml/models/recommendation_model.pkl
+        git add ml/models/recommendation_model.pkl.dvc
+        git commit -m "chore: update trained model [skip ci]" || true
+        git push origin main || true
+    
+    - name: Publish metrics
+      uses: actions/upload-artifact@v3
+      with:
+        name: ml-metrics
+        path: |
+          metrics.json
+          eval_metrics.json
+    
+    - name: Comment on latest commit
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const metrics = JSON.parse(fs.readFileSync('metrics.json'));
+          
+          github.rest.git.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha,
+            body: `🤖 **MLOps Model Training Complete**\n\n✅ Accuracy: ${(metrics.accuracy * 100).toFixed(2)}%\n📊 Samples: ${metrics.n_samples}\n🕐 ${metrics.timestamp}`
+          });

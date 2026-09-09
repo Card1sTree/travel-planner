@@ -1,0 +1,70 @@
+replicaCount: 2
+
+image:
+  registry: docker.io
+  pullPolicy: IfNotPresent
+
+services:
+  recommendationEngine:
+    name: recommendation-engine
+    replicaCount: 2
+    port: 8000
+    image: your-docker-username/recommendation-engine:latest
+    
+  userApi:
+    name: user-api
+    replicaCount: 2
+    port: 8000
+    image: your-docker-username/user-api:latest
+    
+  tripPlanner:
+    name: trip-planner
+    replicaCount: 2
+    port: 8000
+    image: your-docker-username/trip-planner:latest
+
+postgres:
+  enabled: true
+  auth:
+    username: travel_user
+    password: travel_password
+    database: travel_db
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: api.travel-app.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: travel-app-tls
+      hosts:
+        - api.travel-app.local
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    interval: 30s

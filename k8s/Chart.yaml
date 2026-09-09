@@ -1,0 +1,16 @@
+apiVersion: v2
+name: travel-app
+description: A Helm chart for Travel Planner App with microservices
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - travel
+  - ml
+  - devops
+  - kubernetes
+  - argocd
+home: https://github.com/yourusername/travel-app
+maintainers:
+  - name: Your Name
+    email: your.email@example.com

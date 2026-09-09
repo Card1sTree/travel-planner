@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.tripPlanner.name }}
+  labels:
+    app: {{ .Values.services.tripPlanner.name }}
+spec:
+  replicas: {{ .Values.services.tripPlanner.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.tripPlanner.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.tripPlanner.name }}
+    spec:
+      containers:
+      - name: {{ .Values.services.tripPlanner.name }}
+        image: "{{ .Values.services.tripPlanner.image }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.services.tripPlanner.port }}
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://{{ .Values.postgres.auth.username }}:{{ .Values.postgres.auth.password }}@postgres:5432/{{ .Values.postgres.auth.database }}"
+        - name: RECOMMENDATION_ENGINE_URL
+          value: "http://{{ .Values.services.recommendationEngine.name }}:{{ .Values.services.recommendationEngine.port }}"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.services.tripPlanner.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.services.tripPlanner.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}

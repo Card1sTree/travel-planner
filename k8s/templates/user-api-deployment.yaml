@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.userApi.name }}
+  labels:
+    app: {{ .Values.services.userApi.name }}
+spec:
+  replicas: {{ .Values.services.userApi.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.userApi.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.userApi.name }}
+    spec:
+      containers:
+      - name: {{ .Values.services.userApi.name }}
+        image: "{{ .Values.services.userApi.image }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.services.userApi.port }}
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://{{ .Values.postgres.auth.username }}:{{ .Values.postgres.auth.password }}@postgres:5432/{{ .Values.postgres.auth.database }}"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.services.userApi.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.services.userApi.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}

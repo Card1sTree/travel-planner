@@ -1,0 +1,31 @@
+stages:
+  prepare:
+    cmd: python prepare_data.py
+    deps:
+      - data/raw_travel_data.csv
+    outs:
+      - data/processed_travel_data.csv
+  
+  train:
+    cmd: python train.py
+    deps:
+      - data/processed_travel_data.csv
+      - train.py
+    outs:
+      - models/recommendation_model.pkl
+    metrics:
+      - metrics.json:
+          cache: false
+  
+  evaluate:
+    cmd: python evaluate.py
+    deps:
+      - models/recommendation_model.pkl
+      - data/processed_travel_data.csv
+    metrics:
+      - eval_metrics.json:
+          cache: false
+
+plots:
+  - metrics.json
+  - eval_metrics.json

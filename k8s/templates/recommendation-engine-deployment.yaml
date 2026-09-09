@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.services.recommendationEngine.name }}
+  labels:
+    app: {{ .Values.services.recommendationEngine.name }}
+spec:
+  replicas: {{ .Values.services.recommendationEngine.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.services.recommendationEngine.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.services.recommendationEngine.name }}
+    spec:
+      containers:
+      - name: {{ .Values.services.recommendationEngine.name }}
+        image: "{{ .Values.services.recommendationEngine.image }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.services.recommendationEngine.port }}
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://{{ .Values.postgres.auth.username }}:{{ .Values.postgres.auth.password }}@postgres:5432/{{ .Values.postgres.auth.database }}"
+        - name: MODEL_PATH
+          value: "/app/models/recommendation_model.pkl"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.services.recommendationEngine.port }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.services.recommendationEngine.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
