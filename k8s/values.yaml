@@ -9,19 +9,19 @@ services:
     name: recommendation-engine
     replicaCount: 2
     port: 8000
-    image: your-docker-username/recommendation-engine:latest
+    image: ghcr.io/card1stree/recommendation-engine:IMAGE_TAG
     
   userApi:
     name: user-api
     replicaCount: 2
     port: 8000
-    image: your-docker-username/user-api:latest
+    image: ghcr.io/card1stree/user-api:COMMIT_SHA
     
   tripPlanner:
     name: trip-planner
     replicaCount: 2
     port: 8000
-    image: your-docker-username/trip-planner:latest
+    image: ghcr.io/card1stree/trip-planner:COMMIT_SHA
 
 postgres:
   enabled: true
