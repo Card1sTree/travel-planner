@@ -1,4 +1,4 @@
-name: Deploy with ArgoCD
+name: Validate GitOps Manifests
 
 on:
   push:
@@ -8,54 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  validate:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Validate Kubernetes manifests
-      run: |
-        # Install kubeval
-        wget https://github.com/instrumenta/kubeval/releases/latest/download/kubeval-linux-amd64.tar.gz
-        tar xf kubeval-linux-amd64.tar.gz
-        
-        # Validate Helm templates
-        helm template travel-app k8s/ | ./kubeval -
-    
-    - name: Setup ArgoCD CLI
-      run: |
-        curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-        chmod +x argocd
-        sudo mv argocd /usr/local/bin/
-    
-    - name: Trigger ArgoCD sync
-      env:
-        ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
-        ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
-      run: |
-        argocd app sync travel-app --force
-        argocd app wait travel-app
-    
-    - name: Verify deployment
-      run: |
-        kubectl get deployments -n travel-app
-        kubectl get pods -n travel-app
-    
-    - name: Check health endpoints
-      run: |
-        sleep 30  # Wait for services to be ready
-        
-        for service in recommendation-engine user-api trip-planner; do
-          kubectl run health-check-$service --image=curlimages/curl:latest --rm -it --restart=Never -- \
-            curl -f http://$service:8000/health || echo "Service $service not ready yet"
-        done
-    
-    - name: Slack notification
-      uses: 8398a7/action-slack@v3
-      if: always()
-      with:
-        status: ${{ job.status }}
-        text: 'Travel App deployment ${{ job.status }}'
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        fields: repo,message,commit,author
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint Helm chart
+        run: helm lint k8s
+
+      - name: Render Helm templates
+        run: helm template travel-app k8s > rendered.yaml
+
+      - name: Verify rendered output
+        run: test -s rendered.yaml
