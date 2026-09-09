@@ -14,9 +14,9 @@ permissions:
   packages: write
 
 env:
-  IMAGE_NAME_RECOMMENDATION: ghcr.io/Card1sTree/recommendation-engine
-  IMAGE_NAME_USER_API: ghcr.io/Card1sTree/user-api
-  IMAGE_NAME_TRIP_PLANNER: ghcr.io/Card1sTree/trip-planner
+  IMAGE_NAME_RECOMMENDATION: ghcr.io/card1stree/recommendation-engine
+  IMAGE_NAME_USER_API: ghcr.io/card1stree/user-api
+  IMAGE_NAME_TRIP_PLANNER: ghcr.io/card1stree/trip-planner
 
 jobs:
   test:
