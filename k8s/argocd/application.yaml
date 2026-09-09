@@ -24,6 +24,3 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-  notifications:
-    - type: slack
-      enabled: true

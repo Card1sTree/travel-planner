@@ -9,19 +9,19 @@ services:
     name: recommendation-engine
     replicaCount: 2
     port: 8000
-    image: ghcr.io/card1stree/recommendation-engine:6409fb4e50ee40d4053a31b4e2613f1ab70ec502
+    image: ghcr.io/card1stree/recommendation-engine:cbf6d010c7b386c99ede519b253d6e76cd3446ac
     
   userApi:
     name: user-api
     replicaCount: 2
     port: 8000
-    image: ghcr.io/card1stree/user-api:6409fb4e50ee40d4053a31b4e2613f1ab70ec502
+    image: ghcr.io/card1stree/user-api:cbf6d010c7b386c99ede519b253d6e76cd3446ac
     
   tripPlanner:
     name: trip-planner
     replicaCount: 2
     port: 8000
-    image: ghcr.io/card1stree/trip-planner:6409fb4e50ee40d4053a31b4e2613f1ab70ec502
+    image: ghcr.io/card1stree/trip-planner:cbf6d010c7b386c99ede519b253d6e76cd3446ac
 
 postgres:
   enabled: true
