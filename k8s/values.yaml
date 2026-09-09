@@ -1,7 +1,7 @@
 replicaCount: 2
 
 image:
-  registry: docker.io
+  registry: ghcr.io
   pullPolicy: IfNotPresent
 
 services:
@@ -9,19 +9,19 @@ services:
     name: recommendation-engine
     replicaCount: 2
     port: 8000
-    image: ghcr.io/card1stree/recommendation-engine:IMAGE_TAG
+    image: ghcr.io/card1stree/recommendation-engine:6409fb4e50ee40d4053a31b4e2613f1ab70ec502
     
   userApi:
     name: user-api
     replicaCount: 2
     port: 8000
-    image: ghcr.io/card1stree/user-api:COMMIT_SHA
+    image: ghcr.io/card1stree/user-api:6409fb4e50ee40d4053a31b4e2613f1ab70ec502
     
   tripPlanner:
     name: trip-planner
     replicaCount: 2
     port: 8000
-    image: ghcr.io/card1stree/trip-planner:COMMIT_SHA
+    image: ghcr.io/card1stree/trip-planner:6409fb4e50ee40d4053a31b4e2613f1ab70ec502
 
 postgres:
   enabled: true
