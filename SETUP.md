@@ -135,8 +135,8 @@ git commit -m "Updated model"
 
 ### Deploy using Helm
 ```bash
-# Update image tags in k8s/values.yaml first
-helm install travel-app k8s/ \
+# Update image tags in deployment-chart/values.yaml first
+helm install travel-planner deployment-chart/ \
   --namespace travel-app \
   --create-namespace
 
@@ -147,7 +147,7 @@ kubectl get all -n travel-app
 ### Deploy using ArgoCD
 ```bash
 # Apply ArgoCD Application
-kubectl apply -f k8s/argocd/application.yaml
+kubectl apply -f deployment-chart/argocd/application.yaml
 
 # Sync application
 argocd app sync travel-app

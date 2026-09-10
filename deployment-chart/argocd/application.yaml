@@ -8,13 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Card1sTree/travel-planner.git
     targetRevision: HEAD
-    path: k8s
-    helm:
-      values: |
-        replicaCount: 2
-        image:
-          registry: docker.io
-          pullPolicy: IfNotPresent
+    path: deployment-chart
   destination:
     server: https://kubernetes.default.svc
     namespace: travel-app

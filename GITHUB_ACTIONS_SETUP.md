@@ -89,7 +89,7 @@ PROJECT_NAME: travel-app
 - **Requires**: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 
 ### .github/workflows/deploy.yml
-- **Trigger**: Changes to k8s/ directory
+- **Trigger**: Changes to deployment-chart/ directory
 - **Functions**:
   - Validates Kubernetes manifests
   - Syncs with ArgoCD

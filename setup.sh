@@ -102,7 +102,7 @@ show_menu() {
             
             echo "Deploying Travel App..."
             kubectl create namespace travel-app
-            kubectl apply -f k8s/argocd/application.yaml
+            kubectl apply -f deployment-chart/argocd/application.yaml
             
             echo "✅ Deployment complete"
             echo "Access ArgoCD UI: kubectl port-forward svc/argocd-server -n argocd 8080:443"

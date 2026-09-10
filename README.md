@@ -75,7 +75,7 @@ All infrastructure and deployment configs are in Git. ArgoCD watches the repo an
 
 ```bash
 # Apply ArgoCD Application
-kubectl apply -f k8s/argocd/application.yaml
+kubectl apply -f deployment-chart/argocd/application.yaml
 ```
 
 View in ArgoCD UI:
@@ -111,7 +111,7 @@ Models are versioned and tracked in Git via DVC.
 │   ├── recommendation-engine/
 │   ├── user-api/
 │   └── trip-planner/
-├── k8s/                        # Kubernetes manifests & Helm
+├── deployment-chart/           # Kubernetes manifests & Helm
 │   ├── templates/
 │   └── argocd/
 ├── docker-compose.yml          # Local development

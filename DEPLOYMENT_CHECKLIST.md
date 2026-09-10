@@ -19,7 +19,7 @@
 - [ ] Push to Docker registry successful
 
 ### Kubernetes & Helm
-- [ ] Helm chart syntax valid (`helm lint k8s/`)
+- [ ] Helm chart syntax valid (`helm lint deployment-chart/`)
 - [ ] All templates render correctly (`helm template`)
 - [ ] Resource limits/requests set appropriately
 - [ ] Health checks configured
@@ -60,7 +60,7 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # 3. Create ArgoCD Application
-kubectl apply -f k8s/argocd/application.yaml
+kubectl apply -f deployment-chart/argocd/application.yaml
 
 # 4. Wait for sync
 argocd app wait travel-app

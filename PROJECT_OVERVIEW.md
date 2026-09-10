@@ -108,7 +108,7 @@ curl http://localhost:8003/health  # Trip Planner
 kubectl create namespace travel-app
 
 # Deploy with Helm
-helm install travel-app k8s/ -n travel-app
+helm install travel-planner deployment-chart/ -n travel-app
 
 # Check status
 kubectl get all -n travel-app
@@ -121,7 +121,7 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # Deploy with ArgoCD
-kubectl apply -f k8s/argocd/application.yaml
+kubectl apply -f deployment-chart/argocd/application.yaml
 
 # Access ArgoCD UI
 kubectl port-forward svc/argocd-server -n argocd 8080:443
@@ -175,10 +175,10 @@ travel-app/
 │   ├── recommendation-engine/  # ML inference
 │   ├── user-api/              # User management
 │   └── trip-planner/          # Trip orchestration
-├── k8s/                        # Kubernetes & Helm
+├── deployment-chart/           # Helm chart and Kubernetes manifests
 │   ├── Chart.yaml             # Helm chart metadata
 │   ├── values.yaml            # Helm configuration
-│   ├── templates/             # K8s manifests
+│   ├── templates/              # Kubernetes manifests
 │   └── argocd/                # ArgoCD Application
 ├── docker-compose.yml         # Local development
 ├── dvc.yaml                   # DVC configuration

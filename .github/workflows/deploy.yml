@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'k8s/**'
+      - 'deployment-chart/**'
   workflow_dispatch:
 
 jobs:
@@ -18,10 +18,10 @@ jobs:
         uses: azure/setup-helm@v4
 
       - name: Lint Helm chart
-        run: helm lint k8s
+        run: helm lint deployment-chart
 
       - name: Render Helm templates
-        run: helm template travel-app k8s > rendered.yaml
+        run: helm template travel-planner deployment-chart > rendered.yaml
 
       - name: Verify rendered output
         run: test -s rendered.yaml
